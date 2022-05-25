@@ -1,0 +1,17 @@
+host: 127.0.0.1
+port: 22800
+proxy: false
+maxIpsCount: 2
+
+redis:
+  host: 127.0.0.1
+  port: 6379
+  passwd: ''
+  db: 2
+socketIO:
+  serveClient: false
+  transports:
+    - polling
+    - websocket
+  pingInterval: 30000
+
