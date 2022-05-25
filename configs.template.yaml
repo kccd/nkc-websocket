@@ -6,8 +6,10 @@ maxIpsCount: 2
 redis:
   host: 127.0.0.1
   port: 6379
+  version: 3,
+  username: ''
   passwd: ''
-  db: 2
+  dbNumber: 2
 socketIO:
   serveClient: false
   transports:

@@ -1,3 +1,4 @@
+type Transport = 'polling' | 'websocket';
 export interface Configs {
   // websocket 服务监听地址
   host: string;
@@ -8,14 +9,16 @@ export interface Configs {
   // 如果前面仅有一个代理则此字段应设置为2
   maxIpsCount: number;
   redis: {
+    version: number;
     host: string;
     port: number;
+    username: string;
     passwd: string;
-    db: number;
+    dbNumber: number;
   };
   socketIO: {
     serveClient: boolean;
-    transports: string[];
+    transports: Transport[];
     pingInterval: number;
   };
 }

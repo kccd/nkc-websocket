@@ -1,12 +1,11 @@
 import {ServiceBroker} from 'moleculer';
 
 export const ServiceActionNames = {
-  v1_verification_verify_email_code: 'v1.verification.verifyEmailCode',
-  v1_verification_verify_mobile_code: 'v1.verification.verifyMobileCode',
+  v1_nkc_websocket_auth: 'v1.nkc.websocketAuth',
 };
 
 export const Broker = new ServiceBroker({
-  nodeID: `nkc-account_${process.pid.toString()}`,
+  nodeID: `nkc-websocket_${process.pid.toString()}`,
   transporter: 'TCP',
   registry: {
     strategy: 'Random',

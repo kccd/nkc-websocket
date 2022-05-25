@@ -1,37 +1,44 @@
 import {readFileSync} from 'fs';
 import {resolve} from 'path';
-import {Config} from '../interfaces/config';
+import {Configs} from '../interfaces/configs';
 import {yamlToJson} from './yaml';
 
 const configFilePath = resolve(__dirname, '../../configs.yaml');
 const yamlContent = readFileSync(configFilePath).toString();
 
-const configs = <Config>yamlToJson(yamlContent);
+const configs = <Configs>yamlToJson(yamlContent);
 
-export function GetUsernameLengthLimit(): {
-  maxLength: number;
-  minLength: number;
-} {
+export function GetServerConfigs() {
   return {
-    maxLength: configs.user.name.maxLength,
-    minLength: configs.user.name.minLength,
+    host: configs.host,
+    port: configs.port,
   };
 }
 
-export function GetUserPasswdLengthLimit(): {
-  maxLength: number;
-  minLength: number;
-} {
+export function GetRedisConfigs() {
+  const {port, host, username, passwd, dbNumber, version} = configs.redis;
+  let account = '';
+  if (passwd) {
+    account = `${username}:${passwd}@`;
+  }
   return {
-    maxLength: configs.user.passwd.maxLength,
-    minLength: configs.user.passwd.minLength,
+    version,
+    port,
+    host,
+    username,
+    passwd,
+    dbNumber,
+    url: `redis://${account}${host}:${port}/${dbNumber}`,
   };
 }
 
-export function GetTokenSecret(): string {
-  return configs.token.secret;
+export function GetProxyConfigs() {
+  return {
+    proxy: configs.proxy,
+    maxIpsCount: configs.maxIpsCount,
+  };
 }
 
-export function GetTokenExpiresIn(): string {
-  return configs.token.expiresIn;
+export function GetSocketIOConfigs() {
+  return configs.socketIO;
 }
