@@ -11,6 +11,7 @@ import {ErrorLog} from './modules/logger';
 
 import WsInit from './middlewares/wsInit';
 import WsAuth from './middlewares/wsAuth';
+import Routes from './routes';
 
 const {serveClient, transports, pingInterval} = GetSocketIOConfigs();
 const {host, port} = GetServerConfigs();
@@ -35,6 +36,7 @@ io.on('error', err => {
 const namespace = io.of('/common');
 namespace.use(WsInit);
 namespace.use(WsAuth);
+Routes(namespace);
 
 export function StartWebsocketServer() {
   return Promise.resolve()

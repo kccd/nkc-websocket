@@ -1,9 +1,10 @@
 import {GetProxyConfigs} from '../modules/configs';
+import {Socket} from 'socket.io';
 const {proxy, maxIpsCount} = GetProxyConfigs();
 
 export function GetRealIp(remoteIp: string, xForwardedFor: string) {
   if (proxy) {
-    let xForwardedForArr: string[] = [];
+    let xForwardedForArr: string[];
     if (xForwardedFor) {
       xForwardedForArr = xForwardedFor.split(',');
     } else {
@@ -15,4 +16,10 @@ export function GetRealIp(remoteIp: string, xForwardedFor: string) {
     remoteIp = _ip || remoteIp;
   }
   return remoteIp.replace(/^::ffff:/, '');
+}
+
+export function DisconnectSocket(socket: Socket) {
+  if (socket && !socket.disconnected && socket.disconnect) {
+    socket.disconnect(true);
+  }
 }
