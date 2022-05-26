@@ -8,8 +8,22 @@ export interface Configs {
   // 经过代理时允许的最大IP数
   // 如果前面仅有一个代理则此字段应设置为2
   maxIpsCount: number;
+  maxConnection: number;
+  moleculer: {
+    namespace: string;
+    nodeID: string;
+    transporter: string;
+    registry: {
+      strategy: string;
+      discoverer: string;
+    };
+    web: {
+      enabled: boolean;
+      port: number;
+      host: string;
+    };
+  };
   redis: {
-    version: number;
     host: string;
     port: number;
     username: string;

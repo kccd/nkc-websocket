@@ -1,4 +1,4 @@
-import {Broker} from './modules/communication';
+import {Broker} from './modules/broker';
 import app from './app';
 import {InfoLog} from './modules/logger';
 import {StartWebsocketServer} from './websocket';

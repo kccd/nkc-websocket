@@ -1,19 +1,31 @@
-host: 127.0.0.1
+host: '127.0.0.1'
 port: 22800
 proxy: false
 maxIpsCount: 2
+maxConnection: 10
+
+moleculer:
+  namespace: 'NKC_MESH_PRODUCTION'
+  nodeID: 'NKC_WEBSOCKET'
+  transporter: 'TCP'
+  registry:
+    strategy: 'Random'
+    discoverer: 'Local'
+  web:
+    enabled: true
+    port: 20395
+    host: '127.0.0.1'
 
 redis:
-  host: 127.0.0.1
+  host: '127.0.0.1'
   port: 6379
-  version: 3,
   username: ''
   passwd: ''
   dbNumber: 2
 socketIO:
   serveClient: false
   transports:
-    - polling
-    - websocket
+    - 'polling'
+    - 'websocket'
   pingInterval: 30000
 

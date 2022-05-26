@@ -15,7 +15,7 @@ import Routes from './routes';
 
 const {serveClient, transports, pingInterval} = GetSocketIOConfigs();
 const {host, port} = GetServerConfigs();
-const {url, version} = GetRedisConfigs();
+const {url} = GetRedisConfigs();
 const httpServer = createServer();
 
 const pubClient = createClient({url});
@@ -31,25 +31,24 @@ io.on('error', err => {
   ErrorLog(err as Error);
 });
 
-(io.adapter as (v: unknown) => undefined)(createAdapter(pubClient, subClient));
-
-const namespace = io.of('/common');
-namespace.use(WsInit);
-namespace.use(WsAuth);
-Routes(namespace);
+const CommonSpace = io.of('/common');
+CommonSpace.use(WsInit);
+CommonSpace.use(WsAuth);
+Routes(CommonSpace);
 
 export function StartWebsocketServer() {
   return Promise.resolve()
     .then(() => {
-      if (version > 3) {
-        return Promise.all([pubClient.connect(), subClient.connect()]);
-      }
+      return Promise.all([pubClient.connect(), subClient.connect()]);
     })
     .then(() => {
+      (io.adapter as (v: unknown) => undefined)(
+        createAdapter(pubClient, subClient),
+      );
       httpServer.listen(port, host, () => {
         console.log(`Websocket server is running at ${host}:${port}`);
       });
     });
 }
 
-export {io};
+export {io, CommonSpace};

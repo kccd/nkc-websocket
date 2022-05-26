@@ -1,5 +1,5 @@
-import {GetProxyConfigs} from '../modules/configs';
-import {Socket} from 'socket.io';
+import {GetProxyConfigs, GetRedisConfigs} from '../modules/configs';
+import {Namespace, Socket} from 'socket.io';
 const {proxy, maxIpsCount} = GetProxyConfigs();
 
 export function GetRealIp(remoteIp: string, xForwardedFor: string) {
@@ -22,4 +22,31 @@ export function DisconnectSocket(socket: Socket) {
   if (socket && !socket.disconnected && socket.disconnect) {
     socket.disconnect(true);
   }
+}
+
+export async function GetRoomClientCount(
+  namespace: Namespace,
+  roomName: string,
+): Promise<number> {
+  const sockets = await GetRoomClientsId(namespace, roomName);
+  return sockets.length;
+}
+
+export async function GetRoomClientsId(
+  namespace: Namespace,
+  roomName: string,
+): Promise<string[]> {
+  const sockets = await namespace.in(roomName).allSockets();
+  return [...sockets];
+}
+
+export async function DisconnectSocketById(
+  namespace: Namespace,
+  socketId: string,
+) {
+  return await (
+    namespace.adapter as unknown as {
+      remoteDisconnect: (v1: string, v2: boolean) => Promise<void>;
+    }
+  ).remoteDisconnect(socketId, true);
 }

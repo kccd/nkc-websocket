@@ -16,13 +16,12 @@ export function GetServerConfigs() {
 }
 
 export function GetRedisConfigs() {
-  const {port, host, username, passwd, dbNumber, version} = configs.redis;
+  const {port, host, username, passwd, dbNumber} = configs.redis;
   let account = '';
   if (passwd) {
     account = `${username}:${passwd}@`;
   }
   return {
-    version,
     port,
     host,
     username,
@@ -41,4 +40,14 @@ export function GetProxyConfigs() {
 
 export function GetSocketIOConfigs() {
   return configs.socketIO;
+}
+
+export function GetConnectionConfigs() {
+  return {
+    maxConnection: configs.maxConnection,
+  };
+}
+
+export function GetMoleculerConfigs() {
+  return configs.moleculer;
 }
