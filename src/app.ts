@@ -4,7 +4,8 @@ import {GetMoleculerConfigs} from './modules/configs';
 const moleculerConfigs = GetMoleculerConfigs();
 const mixins = moleculerConfigs.web.enabled ? [ApiService] : [];
 
-import sendRoomMessage from './actions/sendRoomMessage';
+import sendMessageToRooms from './actions/sendMessageToRooms';
+import sendMessageToRoom from './actions/sendMessageToRoom';
 
 export default <ServiceSchema>{
   name: 'websocket',
@@ -15,6 +16,7 @@ export default <ServiceSchema>{
     host: moleculerConfigs.web.host,
   },
   actions: {
-    sendRoomMessage,
+    sendMessageToRooms,
+    sendMessageToRoom,
   },
 };

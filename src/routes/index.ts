@@ -10,19 +10,41 @@ import {GetUserRoomName} from '../services/wsRoom';
 import {GetConnectionConfigs} from '../modules/configs';
 
 import Message from './message';
+import Forum from './forum';
+import Post from './post';
 
 const {maxConnection} = GetConnectionConfigs();
 
 export default function (namespace: Namespace) {
   namespace.on('connection', async socket => {
-    socket.on('error', err => {
-      ErrorLog(err);
-      DisconnectSocket(socket);
-    });
-    socket.on('disconnect', () => {
-      DisconnectSocket(socket);
-    });
     try {
+      socket.on('error', err => {
+        ErrorLog(err);
+        DisconnectSocket(socket);
+      });
+      socket.on('disconnect', () => {
+        DisconnectSocket(socket);
+      });
+
+      socket.on('joinRoom', async req => {
+        try {
+          const {type, data} = <{type: string; data: unknown}>req;
+          if (type === 'forum') {
+            const {forumId} = <{forumId: string}>data;
+            await Forum(namespace, socket, {
+              forumId,
+            });
+          } else if (type === 'post') {
+            const {postId} = <{postId: string}>data;
+            await Post(namespace, socket, {
+              postId,
+            });
+          }
+        } catch (err) {
+          DisconnectSocket(socket);
+        }
+      });
+
       const state = (socket as unknown as ISocket).state;
       const {uid} = state;
       // 不允许游客连接
