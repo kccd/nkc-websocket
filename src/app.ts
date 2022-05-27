@@ -20,3 +20,11 @@ export default <ServiceSchema>{
     sendMessageToRoom,
   },
 };
+
+export function ConsoleApiServiceInfo() {
+  if (mixins.length) {
+    console.log(
+      `ApiService is running at ${moleculerConfigs.web.host}:${moleculerConfigs.web.port}`,
+    );
+  }
+}
