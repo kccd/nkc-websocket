@@ -12,6 +12,7 @@ import {GetConnectionConfigs} from '../modules/configs';
 import Message from './message';
 import Forum from './forum';
 import Post from './post';
+import Article from './article';
 
 const {maxConnection} = GetConnectionConfigs();
 
@@ -38,6 +39,11 @@ export default function (namespace: Namespace) {
             const {postId} = <{postId: string}>data;
             await Post(namespace, socket, {
               postId,
+            });
+          } else if (type === 'article') {
+            const {articleId} = <{articleId: string}>data;
+            await Article(namespace, socket, {
+              articleId,
             });
           }
         } catch (err) {

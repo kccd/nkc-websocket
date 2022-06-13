@@ -14,6 +14,10 @@ export function GetPostRoomName(pid: string) {
   return `POST:${pid}`;
 }
 
+export function GetArticleRoomName(aid: string) {
+  return `ARTICLE:${aid}`;
+}
+
 export function GetConsoleRoomName() {
   return `CONSOLE`;
 }
