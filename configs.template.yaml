@@ -7,7 +7,7 @@ maxConnection: 10
 moleculer:
   namespace: 'NKC_MESH_PRODUCTION'
   nodeID: 'NKC_WEBSOCKET'
-  transporter: 'TCP'
+  transporter: 'redis://127.0.0.1:6379'
   registry:
     strategy: 'Random'
     discoverer: 'Local'
