@@ -15,16 +15,20 @@ export default async function (namespace: Namespace, socket: Socket) {
   } = (socket as unknown as ISocket).state;
   const userRoom = GetUserRoomName(uid);
   await socket.join(userRoom);
-  SocketEmit(socket, SocketEventNames.newMessageCountAndRedEnvelopeStatus, {
-    newMessageCount,
-    redEnvelopeStatus,
-  });
-  SocketEmit(socket, SocketEventNames.unreadMessageCount, {
-    newMessageCount,
-  });
-  SocketEmit(socket, SocketEventNames.redEnvelopeStatus, {
-    redEnvelopeStatus,
-  });
+
+  setTimeout(() => {
+    try {
+      SocketEmit(socket, SocketEventNames.unreadMessageCount, {
+        newMessageCount,
+      });
+      SocketEmit(socket, SocketEventNames.redEnvelopeStatus, {
+        redEnvelopeStatus,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }, 1000);
+
   // 发送上线通知
   for (const friendUid of friendsUid) {
     const roomName = GetUserRoomName(friendUid);
