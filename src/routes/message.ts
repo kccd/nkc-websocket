@@ -19,6 +19,12 @@ export default async function (namespace: Namespace, socket: Socket) {
     newMessageCount,
     redEnvelopeStatus,
   });
+  SocketEmit(socket, SocketEventNames.unreadMessageCount, {
+    newMessageCount,
+  });
+  SocketEmit(socket, SocketEventNames.redEnvelopeStatus, {
+    redEnvelopeStatus,
+  });
   // 发送上线通知
   for (const friendUid of friendsUid) {
     const roomName = GetUserRoomName(friendUid);

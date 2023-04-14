@@ -13,6 +13,8 @@ export const ServiceActionNames = {
 export const SocketEventNames = {
   newMessageCountAndRedEnvelopeStatus: 'newMessageCountAndRedEnvelopeStatus',
   updateUserOnlineStatus: 'updateUserOnlineStatus',
+  unreadMessageCount: 'unreadMessageCount',
+  redEnvelopeStatus: 'redEnvelopeStatus',
 };
 
 export function BrokerCall<T>(
