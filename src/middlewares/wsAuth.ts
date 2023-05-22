@@ -14,7 +14,7 @@ export default async function (socket: Socket, next: () => void) {
       ServiceActionNames.v1_nkc_websocket_auth,
       {
         cookie,
-        operationId,
+        // operationId,
         os,
       },
     );
