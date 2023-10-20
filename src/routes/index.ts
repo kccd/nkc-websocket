@@ -13,6 +13,7 @@ import Message from './message';
 import Forum from './forum';
 import Post from './post';
 import Article from './article';
+import zoneHome from './zoneHome';
 
 const {maxConnection} = GetConnectionConfigs();
 
@@ -45,6 +46,8 @@ export default function (namespace: Namespace) {
             await Article(namespace, socket, {
               articleId,
             });
+          } else if (type === 'zoneHome') {
+            await zoneHome(namespace, socket);
           }
         } catch (err) {
           DisconnectSocket(socket);
