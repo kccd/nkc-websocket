@@ -21,3 +21,7 @@ export function GetArticleRoomName(aid: string) {
 export function GetConsoleRoomName() {
   return `CONSOLE`;
 }
+
+export function GetZoneHomeRoomName() {
+  return `ZONEHOME`;
+}
