@@ -1,7 +1,6 @@
 import {Broker} from './broker';
 import {BroadcastOperator, Socket} from 'socket.io';
 import {
-  DecorateAcknowledgementsWithMultipleResponses,
   DefaultEventsMap,
   TypedEventBroadcaster,
 } from 'socket.io/dist/typed-events';
@@ -34,10 +33,6 @@ export function SocketEmit(socket: Socket, eventName: string, params: unknown) {
 
 export function SocketRoomEmit(
   room: TypedEventBroadcaster<DefaultEventsMap>,
-  // room: BroadcastOperator<
-  //   DecorateAcknowledgementsWithMultipleResponses<DefaultEventsMap>,
-  //   unknown
-  // >,
   eventName: string,
   params: unknown,
 ) {
