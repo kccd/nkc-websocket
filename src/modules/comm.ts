@@ -1,6 +1,10 @@
 import {Broker} from './broker';
 import {BroadcastOperator, Socket} from 'socket.io';
-import {DefaultEventsMap} from 'socket.io/dist/typed-events';
+import {
+  DecorateAcknowledgementsWithMultipleResponses,
+  DefaultEventsMap,
+  TypedEventBroadcaster,
+} from 'socket.io/dist/typed-events';
 
 export const ServiceActionNames = {
   v1_nkc_websocket_auth: 'v1.nkc.websocketAuth',
@@ -29,7 +33,11 @@ export function SocketEmit(socket: Socket, eventName: string, params: unknown) {
 }
 
 export function SocketRoomEmit(
-  room: BroadcastOperator<DefaultEventsMap>,
+  room: TypedEventBroadcaster<DefaultEventsMap>,
+  // room: BroadcastOperator<
+  //   DecorateAcknowledgementsWithMultipleResponses<DefaultEventsMap>,
+  //   unknown
+  // >,
   eventName: string,
   params: unknown,
 ) {
