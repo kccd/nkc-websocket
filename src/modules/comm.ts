@@ -1,9 +1,5 @@
 import {Broker} from './broker';
-import {BroadcastOperator, Socket} from 'socket.io';
-import {
-  DefaultEventsMap,
-  TypedEventBroadcaster,
-} from 'socket.io/dist/typed-events';
+import {Socket} from 'socket.io';
 
 export const ServiceActionNames = {
   v1_nkc_websocket_auth: 'v1.nkc.websocketAuth',
@@ -32,7 +28,7 @@ export function SocketEmit(socket: Socket, eventName: string, params: unknown) {
 }
 
 export function SocketRoomEmit(
-  room: TypedEventBroadcaster<DefaultEventsMap>,
+  room: {emit: (eventName: string, ...args: unknown[]) => boolean},
   eventName: string,
   params: unknown,
 ) {

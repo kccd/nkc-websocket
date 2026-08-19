@@ -1,8 +1,8 @@
 import {Namespace, Socket} from 'socket.io';
-import {ISocket} from '../interfaces/ws';
-import {CheckUserPostPermission} from '../services/user';
-import {DisconnectSocket} from '../services/wsClient';
-import {GetPostRoomName} from '../services/wsRoom';
+import {ISocket} from '@/interfaces/ws';
+import {CheckUserPostPermission} from '@/services/user';
+import {DisconnectSocket} from '@/services/wsClient';
+import {GetPostRoomName} from '@/services/wsRoom';
 
 export default async function (
   namespace: Namespace,

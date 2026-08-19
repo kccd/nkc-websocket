@@ -5,7 +5,7 @@ import {DisconnectSocket} from '../services/wsClient';
 import {GetArticleRoomName} from '../services/wsRoom';
 
 export default async function (
-  namespace: Namespace,
+  _namespace: Namespace,
   socket: Socket,
   data: {articleId: string},
 ) {

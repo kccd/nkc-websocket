@@ -1,10 +1,10 @@
-import { Namespace, Socket } from 'socket.io';
-import { ISocket } from '../interfaces/ws';
-import { DisconnectSocket } from '../services/wsClient';
-import { GetZoneHomeRoomName } from '../services/wsRoom';
+import {Namespace, Socket} from 'socket.io';
+import {ISocket} from '@/interfaces/ws';
+import {DisconnectSocket} from '@/services/wsClient';
+import {GetZoneHomeRoomName} from '@/services/wsRoom';
 
 export default async function (
-  namespace: Namespace,
+  _namespace: Namespace,
   socket: Socket,
   // data: {avatars: object<>},
 ) {

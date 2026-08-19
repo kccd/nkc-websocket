@@ -4,11 +4,15 @@
     "module": "commonjs",
     "sourceMap": true,
     "outDir": "./dist",
+    "rootDir": "./src",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": [".eslintrc.js","src"],
+  "include": ["src"],
   "exclude": ["node_modules", "dist", "public"]
 }

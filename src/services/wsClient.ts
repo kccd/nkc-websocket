@@ -1,5 +1,6 @@
-import {GetProxyConfigs, GetRedisConfigs} from '../modules/configs';
+import {GetProxyConfigs} from '../modules/configs';
 import {Namespace, Socket} from 'socket.io';
+
 const {proxy, maxIpsCount} = GetProxyConfigs();
 
 export function GetRealIp(remoteIp: string, xForwardedFor: string) {

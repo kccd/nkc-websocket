@@ -1,9 +1,9 @@
 import {Namespace, Socket} from 'socket.io';
-import {ISocket} from '../interfaces/ws';
-import {GetUserRoomName} from '../services/wsRoom';
-import {SocketEmit, SocketEventNames, SocketRoomEmit} from '../modules/comm';
+import {ISocket} from '@/interfaces/ws';
+import {GetUserRoomName} from '@/services/wsRoom';
+import {SocketEmit, SocketEventNames, SocketRoomEmit} from '@/modules/comm';
 import {GetRoomClientsId} from '../services/wsClient';
-import {GetUserFriendsUid, SetUserOnlineStatus} from '../services/user';
+import {GetUserFriendsUid, SetUserOnlineStatus} from '@/services/user';
 
 export default async function (namespace: Namespace, socket: Socket) {
   const {

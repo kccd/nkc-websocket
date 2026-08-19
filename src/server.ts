@@ -1,13 +1,18 @@
-import {Broker} from './modules/broker';
+import {Broker} from '@/modules/broker';
 import app, {ConsoleApiServiceInfo} from './app';
-import {InfoLog} from './modules/logger';
+import {logger} from '@/modules/logger';
 import {StartWebsocketServer} from './websocket';
+import {env} from '@/modules/env';
 
 Broker.createService(app);
 
 async function run() {
   await Broker.start();
-  InfoLog('Service started');
+  logger.info(
+    'Service started, Env: %s, Version: %s',
+    env,
+    process.env.npm_package_version,
+  );
   ConsoleApiServiceInfo();
   await StartWebsocketServer();
 }
