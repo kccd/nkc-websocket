@@ -3,6 +3,7 @@ import {resolve} from 'path';
 import {Configs} from '../interfaces/configs';
 import {yamlToJson} from './yaml';
 import {GetArgs} from './args';
+
 const {port: argsPort, host: argsHost} = GetArgs();
 
 const configFilePath = resolve(__dirname, '../../configs.yaml');

@@ -1,6 +1,7 @@
 import {ServiceSchema} from 'moleculer';
 import ApiService from 'moleculer-web';
 import {GetMoleculerConfigs} from './modules/configs';
+
 const moleculerConfigs = GetMoleculerConfigs();
 const mixins = moleculerConfigs.web.enabled ? [ApiService] : [];
 

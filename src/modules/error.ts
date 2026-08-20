@@ -1,6 +1,6 @@
 import Moleculer from 'moleculer';
 import MoleculerError = Moleculer.Errors.MoleculerError;
-import {ErrorLog} from './logger';
+import {logger} from './logger';
 
 export const HttpErrorCodes = {
   OK: 200,
@@ -34,17 +34,14 @@ export function ThrowHttpError(
   type: string,
   error: string | Error = '',
 ): MoleculerError {
-  let stackInfo = '';
-  let messageInfo = '';
-  if (typeof error === 'string') {
-    stackInfo = error;
-    messageInfo = error;
-  } else {
-    stackInfo = error.stack || error.message || error.toString();
-    messageInfo = error.message || '';
-  }
-  ErrorLog(
-    `ERR_CODE: ${code.toString()}\nERR_TYPE: ${type}\nERR_MESSAGE: ${stackInfo}`,
+  const stackInfo =
+    typeof error === 'string'
+      ? error
+      : error.stack || error.message || error.toString();
+  const messageInfo = typeof error === 'string' ? error : error.message || '';
+
+  logger.error(
+    `ERR_CODE: ${code}\nERR_TYPE: ${type}\nERR_MESSAGE: ${stackInfo}`,
   );
   throw new MoleculerError(messageInfo, code, type);
 }

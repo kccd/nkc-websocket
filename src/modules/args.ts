@@ -1,7 +1,10 @@
 import {Command} from 'commander';
+
 const program = new Command();
+
 program.option('-h, --host [type]', '').option('-p, --port [type]', '');
 program.parse(process.argv);
+
 const {port, host} = program.opts<{
   port: string | boolean | undefined;
   host: string | boolean | undefined;

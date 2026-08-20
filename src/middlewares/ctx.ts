@@ -1,9 +1,9 @@
-import {GetRealIp} from '../services/wsClient';
-import {ISocket} from '../interfaces/ws';
+import {GetRealIp} from '@/services/wsClient';
+import {ISocket} from '@/interfaces/ws';
 import {Socket} from 'socket.io';
-import {ErrorLog} from '../modules/logger';
+import {logger} from '@/modules/logger';
 
-export default function (socket: Socket, next: () => void) {
+export function SocketioCtx(socket: Socket, next: () => void) {
   try {
     const ip = GetRealIp(
       socket.handshake.address,
@@ -15,7 +15,7 @@ export default function (socket: Socket, next: () => void) {
     };
     next();
   } catch (err) {
-    ErrorLog(err as Error);
+    logger.error((err as Error).message);
     (next as (v: unknown) => void)(err);
   }
 }

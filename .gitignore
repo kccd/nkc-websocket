@@ -5,3 +5,7 @@
 /.idea
 /doc
 /logs
+*.bak
+test_*
+log/
+temp/

@@ -1,5 +1,7 @@
 import {Context} from 'moleculer';
-import {CommonSpace} from '../websocket';
+import {CommonSpace} from '@/modules/socket';
+import {logger} from '@/modules/logger';
+import {WSSToRoom} from '@/modules/wss';
 
 /**
  * @api {POST} /websocket/sendMessageToRoom 发送信息到 websocket 房间
@@ -26,6 +28,17 @@ export default {
       data: unknown;
       event: string;
     };
+
+    if (CommonSpace == null) {
+      logger.error('WebSocket server is not initialized');
+      return;
+    }
+
     CommonSpace.to(room).emit(event, data);
+    WSSToRoom(room, event, data);
+
+    logger.info(
+      `Sent message to room ${room}: event=${event}, data=${JSON.stringify(data)}`,
+    );
   },
 };
