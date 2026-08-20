@@ -28,4 +28,3 @@ socketIO:
     - 'polling'
     - 'websocket'
   pingInterval: 30000
-

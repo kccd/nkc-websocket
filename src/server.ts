@@ -8,11 +8,7 @@ Broker.createService(app);
 
 async function run() {
   await Broker.start();
-  logger.info(
-    'Service started, Env: %s, Version: %s',
-    env,
-    process.env.npm_package_version,
-  );
+  logger.info('Service started, Env: %s', env);
   ConsoleApiServiceInfo();
   await StartWebsocketServer();
 }
