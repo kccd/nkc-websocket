@@ -1,3 +1,4 @@
+import {randomBytes} from 'crypto';
 import {IncomingMessage, Server} from 'http';
 import {WebSocketServer, WebSocket} from 'ws';
 import {logger} from './logger';
@@ -53,7 +54,8 @@ function join(ws: WebSocket, room: string) {
   socketRooms.get(ws)!.add(room);
 
   logger.info(
-    '[WSS] 用户 %s 加入房间 %s, 当前房间人数: %d',
+    '[WSS] 客户端 [%s] 用户 %s 加入房间 %s, 当前房间人数: %d',
+    socketStates.get(ws)?.id || 'unknown',
     socketStates.get(ws)?.uid || 'unknown',
     room,
     to(room).size(),
@@ -182,6 +184,7 @@ async function auth(
     const {uid, onlineStatus, friendsUid, newMessageCount, redEnvelopeStatus} =
       <AuthInfo>authInfo;
     socketStates.set(socket, {
+      ...socketStates.get(socket)!,
       address,
       os,
       uid,
@@ -192,7 +195,11 @@ async function auth(
     });
     return true;
   } catch (err) {
-    logger.error('[WSS] 连接认证失败: %s', (err as Error).message);
+    logger.error(
+      '[WSS] 客户端 [%s] 连接认证失败: %s',
+      socketStates.get(socket)?.id || 'unknown',
+      (err as Error).message,
+    );
     return false;
   }
 }
@@ -216,8 +223,18 @@ export function WSSToRooms(rooms: string[], event: string, data: unknown) {
 
 export function WSSInit(httpServer: Server) {
   instance.on('connection', (socket, request) => {
+    socketStates.set(socket, {
+      id: randomBytes(15).toString('base64url'),
+      address: '',
+      os: '',
+    });
+
     socket.on('close', () => {
-      logger.info('[WSS] 原生 WS 客户端断开');
+      logger.info(
+        '[WSS] 客户端 [%s] uid: %s 断开连接',
+        socketStates.get(socket)?.id || 'unknown',
+        socketStates.get(socket)?.uid || 'unknown',
+      );
       leaveAll(socket);
       socketStates.delete(socket);
     });
@@ -237,7 +254,8 @@ export function WSSInit(httpServer: Server) {
         const {uid} = socketStates.get(socket)!;
 
         logger.info(
-          '[WSS] 原生 WS 客户端连接成功, uid: %s ip: %s',
+          '[WSS] 客户端 [%s] uid: %s ip: %s 已连接',
+          socketStates.get(socket)?.id || 'unknown',
           uid,
           socketStates.get(socket)?.address,
         );

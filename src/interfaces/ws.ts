@@ -1,6 +1,7 @@
 import {Socket} from 'socket.io';
 
 export interface ISocketState {
+  id: string;
   address: string;
   os: string;
   uid?: string;
