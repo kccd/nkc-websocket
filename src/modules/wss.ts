@@ -2,6 +2,7 @@ import {IncomingMessage, Server} from 'http';
 import {WebSocketServer, WebSocket} from 'ws';
 import {logger} from './logger';
 import {AuthInfo, ISocketState} from '@/interfaces/ws';
+import {GetConnectionConfigs} from '@/modules/configs';
 import {BrokerCall, ServiceActionNames} from '@/modules/comm';
 import {GetRealIp} from '@/services/wsClient';
 import {
@@ -23,6 +24,8 @@ const socketRooms = new WeakMap<WebSocket, Set<string>>();
 const socketStates = new WeakMap<WebSocket, ISocketState>();
 
 const instance = new WebSocketServer({noServer: true});
+
+const {maxConnection} = GetConnectionConfigs();
 
 // WSS 载荷数据结构
 export type WSSPayload = {
@@ -241,7 +244,17 @@ export function WSSInit(httpServer: Server) {
 
         // 认证通过后自动加入用户房间
         if (uid) {
-          join(socket, GetUserRoomName(uid));
+          const userRoom = GetUserRoomName(uid);
+          const userConnections = rooms.get(userRoom);
+          if (userConnections) {
+            // 连接数限制 断开最早的超限连接
+            const clients = [...userConnections];
+            const excess = clients.length - maxConnection + 1;
+            for (let i = 0; i < excess; i++) {
+              clients[i].close(4002, 'Connection limit exceeded');
+            }
+          }
+          join(socket, userRoom);
         }
 
         // 收到客户端消息
