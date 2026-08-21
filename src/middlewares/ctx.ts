@@ -10,6 +10,7 @@ export function SocketioCtx(socket: Socket, next: () => void) {
       socket.handshake.headers['x-forwarded-for'] as string,
     );
     (socket as unknown as ISocket).state = {
+      id: socket.id,
       address: ip,
       os: socket.handshake.query.os === 'app' ? 'app' : 'web',
     };
