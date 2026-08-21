@@ -24,71 +24,14 @@ const socketStates = new WeakMap<WebSocket, ISocketState>();
 
 const instance = new WebSocketServer({noServer: true});
 
-// 客户端 -> 服务端 的消息类型
-export type ClientToServerMessage =
-  | {
-      type: 'join';
-      room?: string; // 完整房间名
-      roomType?:
-        | 'user'
-        | 'forum'
-        | 'thread'
-        | 'post'
-        | 'article'
-        | 'console'
-        | 'zonehome';
-      id?: string; // 对应房间类型的 id, 用于生成完整房间名
-    }
-  | {
-      type: 'leave';
-      room?: string;
-      roomType?:
-        | 'user'
-        | 'forum'
-        | 'thread'
-        | 'post'
-        | 'article'
-        | 'console'
-        | 'zonehome';
-      id?: string;
-    }
-  | {
-      type: 'to';
-      room: string;
-      event?: string;
-      data: unknown;
-    }
-  | {
-      type: 'ping';
-    };
-
-// 服务端 -> 客户端 的消息类型
-export type ServerToClientMessage =
-  | {
-      type: 'joined';
-      room: string;
-      size: number;
-    }
-  | {
-      type: 'left';
-      room: string;
-    }
-  | {
-      type: 'room_message';
-      room: string;
-      event: string;
-      data: unknown;
-    }
-  | {
-      type: 'pong';
-    }
-  | {
-      type: 'error';
-      message: string;
-    };
+// WSS 载荷数据结构
+export type WSSPayload = {
+  event: string;
+  data?: unknown;
+};
 
 // 向客户端发送消息
-function send(ws: WebSocket, msg: ServerToClientMessage) {
+function send(ws: WebSocket, msg: WSSPayload) {
   if (ws.readyState === 1) {
     ws.send(JSON.stringify(msg));
   }
@@ -169,14 +112,7 @@ function to(room: string) {
 }
 
 // 解析客户端传入的房间名
-function resolveRoomName(
-  room?: string,
-  roomType?: string,
-  id?: string,
-): string | undefined {
-  if (room) {
-    return room;
-  }
+function resolveRoomName(roomType?: string, id?: string): string | undefined {
   if (roomType && id) {
     switch (roomType) {
       case 'user':
@@ -262,11 +198,9 @@ async function auth(
 export function WSSToRoom(room: string, event: string, data: unknown) {
   to(room).send(
     JSON.stringify({
-      type: 'room_message',
-      room,
       event,
       data,
-    } satisfies ServerToClientMessage),
+    } satisfies WSSPayload),
   );
 }
 
@@ -292,7 +226,7 @@ export function WSSInit(httpServer: Server) {
     auth(socket, request)
       .then(ok => {
         if (!ok) {
-          send(socket, {type: 'error', message: 'Unauthorized'});
+          send(socket, {event: 'error', data: 'Unauthorized'});
           socket.close(4001, 'Unauthorized');
           return;
         }
@@ -310,48 +244,52 @@ export function WSSInit(httpServer: Server) {
           join(socket, GetUserRoomName(uid));
         }
 
+        // 收到客户端消息
         socket.on('message', (data: Buffer) => {
-          let msg: ClientToServerMessage;
+          let msg: WSSPayload;
 
           try {
-            msg = JSON.parse(data.toString()) as ClientToServerMessage;
+            msg = JSON.parse(data.toString()) as WSSPayload;
           } catch {
-            send(socket, {type: 'error', message: 'Invalid JSON'});
+            send(socket, {event: 'error', data: 'Invalid JSON'});
             return;
           }
 
           // 处理客户端消息
-          switch (msg.type) {
+          switch (msg.event) {
             // 加入房间
             case 'join': {
-              const roomName = resolveRoomName(msg.room, msg.roomType, msg.id);
-              if (!roomName) {
-                send(socket, {type: 'error', message: 'Invalid join params'});
+              const {roomType, id} = msg.data as {
+                roomType?: string;
+                id?: string;
+              };
+
+              if (!roomType || !id) {
+                send(socket, {event: 'error', data: 'Missing join params'});
                 break;
               }
 
-              const needPermission =
-                msg.roomType === 'forum' ||
-                msg.roomType === 'post' ||
-                msg.roomType === 'article';
+              // 解析房间名
+              const roomName = resolveRoomName(roomType, id);
+              if (!roomName) {
+                send(socket, {event: 'error', data: 'Invalid join params'});
+                break;
+              }
 
+              // 加入房间
               const doJoin = () => {
                 join(socket, roomName);
-                send(socket, {
-                  type: 'joined',
-                  room: roomName,
-                  size: to(roomName).size(),
-                });
               };
 
-              if (needPermission) {
+              // 房间权限检查
+              if (['forum', 'post', 'article'].includes(roomType)) {
                 const {uid} = socketStates.get(socket)!;
-                checkJoinPermission(uid!, msg.roomType!, msg.id!)
+                checkJoinPermission(uid!, roomType, id)
                   .then(hasPermission => {
                     if (!hasPermission) {
                       send(socket, {
-                        type: 'error',
-                        message: 'Permission denied',
+                        event: 'error',
+                        data: 'Permission denied',
                       });
                       return;
                     }
@@ -362,7 +300,7 @@ export function WSSInit(httpServer: Server) {
                       '[WSS] 检查加入房间权限失败: %s',
                       (err as Error).message,
                     );
-                    send(socket, {type: 'error', message: 'Join failed'});
+                    send(socket, {event: 'error', data: 'Join failed'});
                   });
                 break;
               }
@@ -373,25 +311,47 @@ export function WSSInit(httpServer: Server) {
 
             // 离开房间
             case 'leave': {
-              const roomName = resolveRoomName(msg.room, msg.roomType, msg.id);
+              const {roomType, id} = msg.data as {
+                roomType?: string;
+                id?: string;
+              };
+
+              if (!roomType || !id) {
+                send(socket, {event: 'error', data: 'Missing join params'});
+                break;
+              }
+
+              const roomName = resolveRoomName(roomType, id);
               if (!roomName) {
-                send(socket, {type: 'error', message: 'Invalid leave params'});
+                send(socket, {event: 'error', data: 'Invalid leave params'});
                 break;
               }
               leave(socket, roomName);
-              send(socket, {type: 'left', room: roomName});
+              send(socket, {event: 'left', data: {room: roomName}});
               break;
             }
 
             // 向房间内的所有客户端发送消息
             case 'to': {
-              to(msg.room).send(
+              const {roomType, id} = msg.data as {
+                roomType?: string;
+                id?: string;
+                data?: unknown;
+              };
+
+              // 解析房间名
+              const roomName = resolveRoomName(roomType, id);
+              if (!roomName) {
+                send(socket, {event: 'error', data: 'Invalid join params'});
+                break;
+              }
+
+              // 向房间内的所有客户端发送消息
+              to(roomName).send(
                 JSON.stringify({
-                  type: 'room_message',
-                  room: msg.room,
                   event: msg.event ?? '',
                   data: msg.data,
-                } satisfies ServerToClientMessage),
+                } satisfies WSSPayload),
                 socket,
               );
               break;
@@ -399,13 +359,12 @@ export function WSSInit(httpServer: Server) {
 
             // 心跳
             case 'ping': {
-              send(socket, {type: 'pong'});
+              send(socket, {event: 'pong'});
               break;
             }
 
             default: {
-              const exhaustive: never = msg;
-              console.warn('Unknown message type:', exhaustive);
+              console.warn('Unknown message type:', msg.event);
               break;
             }
           }
