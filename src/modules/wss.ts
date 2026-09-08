@@ -377,14 +377,14 @@ export function WSSInit(httpServer: Server) {
                 break;
               }
 
-              // 向房间内的所有客户端发送消息
-              to(roomName).send(
-                JSON.stringify({
-                  event: msg.event ?? '',
-                  data: msg.data,
-                } satisfies WSSPayload),
-                socket,
-              );
+              // 暂时注释发送方法, 该方法可能会被滥用, 需要在后续版本中添加权限检查后才应当允许发送
+              // to(roomName).send(
+              //   JSON.stringify({
+              //     event: msg.event ?? '',
+              //     data: msg.data,
+              //   } satisfies WSSPayload),
+              //   socket,
+              // );
               break;
             }
 
